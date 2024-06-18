@@ -20,5 +20,8 @@ CONST_WEBSITES = [
     'http://2ip.io',
     'https://ipecho.net/plain',
     'http://ifconfig.me',
-    'http://ip.me'
+    'http://ip.me',
+    'https://www.trackip.net/ip',
+    'https://api.seeip.org',
+    'https://ipapi.co/ip'
 ]
