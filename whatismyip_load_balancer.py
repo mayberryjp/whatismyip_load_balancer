@@ -9,7 +9,7 @@ import os
 from random import randrange
 import datetime
 
-from const import CONST_WEBSITES,CONST_MQTT_HOST,CONST_MQTT_USERNAME,CONST_MQTT_PASSWORD,VERSION,CONST_SLEEP_INTERVAL, IS_CONTAINER
+from const import CONST_WEBSITES,VERSION,CONST_SLEEP_INTERVAL, IS_CONTAINER
 
 if (IS_CONTAINER):
     CONST_MQTT_HOST=os.getenv("MQTT_HOST","earthquake.832-5.jp")
