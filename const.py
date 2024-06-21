@@ -2,9 +2,11 @@ CONST_MQTT_HOST="earthquake.832-5.jp"
 CONST_MQTT_USERNAME="japan"
 CONST_MQTT_PASSWORD="earthquake"
 
-VERSION="v1.0.5"
+IS_CONTAINER=0
 
-CONST_SLEEP_INTERVAL=300
+VERSION="v1.0.6"
+
+CONST_SLEEP_INTERVAL=150
 
 CONST_WEBSITES = [
     'http://ifconfig.me',
@@ -18,7 +20,6 @@ CONST_WEBSITES = [
     'https://api.ipify.org',
     'http://whatismyip.akamai.com',
     'http://2ip.io',
-    'http://ifconfig.me',
     'http://ip.me',
     'https://www.trackip.net/ip',
     'https://api.seeip.org',

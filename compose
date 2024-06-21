@@ -3,7 +3,7 @@ services:
   whatismyip_load_balancer:
     container_name: whatismyip_load_balancer
     restart: "unless-stopped"
-    image: whatismyip_load_balancer:v1.0.5
+    image: whatismyip_load_balancer:v1.0.6
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 

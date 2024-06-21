@@ -5,8 +5,15 @@ import json
 import re
 import logging
 import time
+import os
+from random import randrange
 
-from const import CONST_WEBSITES,CONST_MQTT_HOST,CONST_MQTT_USERNAME,CONST_MQTT_PASSWORD,VERSION,CONST_SLEEP_INTERVAL
+from const import CONST_WEBSITES,CONST_MQTT_HOST,CONST_MQTT_USERNAME,CONST_MQTT_PASSWORD,VERSION,CONST_SLEEP_INTERVAL, IS_CONTAINER
+
+if (IS_CONTAINER):
+    CONST_MQTT_HOST=os.environ["MQTT_HOST"]
+    CONST_MQTT_PASSWORD=os.environ["MQTT_PASSWORD"]
+    CONST_MQTT_USERNAME=os.environ["MQTT_USERNAME"]
 
 requests.packages.urllib3.util.connection.HAS_IPV6 = False
 
@@ -23,62 +30,92 @@ def get_http_payload(url):
 def replace_periods(ip_address):
     return re.sub(r'\W', '_', ip_address)
 
+class WhatIsMyIpSensor:
+    def __init__(self, name):
+        name_replace=replace_periods(name)
+        self.name = f"whatismyip_{name_replace}"
+        self.device_class = None
+        self.state_topic = f"homeassistant/sensor/whatismyip_{name_replace}/state"
+        self.unique_id = f"whatismyip_{name_replace}"
+        self.device = {
+            "identifiers": [f"whatismyip_{name_replace}"],
+            "name": f"What Is My IP Response For {name}"
+        }
+
+    def to_json(self):
+        return {
+            "name": self.name,
+            "device_class": self.device_class,
+            "state_topic": self.state_topic,
+            "unique_id": self.unique_id,
+            "device": self.device
+        }
+
 def initialize():
-    print("Initialize starting...")
-    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
+    logger = logging.getLogger(__name__)
+    logger.info(f"Initialization starting...")
+    print("Initialization starting...")
+    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
     client.username_pw_set(CONST_MQTT_USERNAME,CONST_MQTT_PASSWORD)
     client.connect( CONST_MQTT_HOST, 1883)
-
 
     for website in CONST_WEBSITES:
         website_replace=replace_periods(website)
-        mqtt_payload = {}
-        mqtt_payload["name"]= f"whatismyip_{website_replace}"
-        mqtt_payload["state_topic"]=f"homeassistant/sensor/whatismyip_{website_replace}/state"
-        mqtt_payload["device_class"]=None
-        mqtt_payload["unique_id"]=f"whatismyip_{website_replace}"
 
-        device = {}
-        device["identifiers"] = mqtt_payload["unique_id"]
-        device["name"] = f"What Is My IP Response For {website}"
-
-        mqtt_payload["device"] = device
-        mqtt_payload = json.dumps(mqtt_payload)
-
-        client.publish(f"homeassistant/sensor/whatismyip_{website_replace}/config", payload=mqtt_payload, qos=0, retain=True)
-
+        whatismyip_sensor=WhatIsMyIpSensor(website)
+        # Convert dictionary to JSON string
+        serialized_message = json.dumps(whatismyip_sensor.to_json())
+        print(f"Sending sensor -> {serialized_message}")
+        logger.info(f"Sending sensor -> {serialized_message}")
+        client.publish(f"homeassistant/sensor/japan_earthquake_{website}/config", payload=serialized_message, qos=0, retain=True)
+ 
     client.disconnect()
-    print("Initializing complete...")
+    logger.info(f"Initialization complete...")
+    print("Initialization complete...")
 
 # Function to publish payload to MQTT topic
-def publish_to_mqtt():
-    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
+def ping_and_publish():
+    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
     client.username_pw_set(CONST_MQTT_USERNAME,CONST_MQTT_PASSWORD)
     client.connect( CONST_MQTT_HOST, 1883)
+    logger = logging.getLogger(__name__)
+
+    sites = {}
+
+    count=0
 
     for website in CONST_WEBSITES:
 
         payload = get_http_payload(website)
         payload_strip = payload.strip()
 
-        logger = logging.getLogger(__name__)
-        logger.info(f"Website {website} reports {payload_strip}")
-        print(f"Website {website} reports {payload_strip}")
+       # logger.info(f"Website {website} reports {payload_strip}")
+       # print(f"Website {website} reports {payload_strip}")
         website_replace=replace_periods(website)
+        sites[payload_strip] = sites.get(payload_strip, 0) + 1
+        count=count+1
 
         client.publish(f"homeassistant/sensor/whatismyip_{website_replace}/state", payload=payload_strip, qos=0, retain=False)
  
     client.disconnect()
 
+    logger.info(f"I iterated over {count} sites and saw {len(sites)} unique IP addresses")
+    print(f"I iterated over {count} sites and saw {len(sites)} unique IP addresses")
+    
+    for site in sites.keys():
+        logger.info(f"IP {site} was seen {sites[site]} times")
+        print(f"IP {site} was seen {sites[site]} times")
+
 # Main process
 if __name__ == '__main__':
-    print(f"I am whatismyip_checker running {VERSION}")
-    initialize()
     logger = logging.getLogger(__name__)
+    logger.info(f"I am whatismyip_load_balancer running version {VERSION}")
+    print(f"I am whatismyip_load_balancer running version {VERSION}")
+    initialize()
 
     while True:
-        publish_to_mqtt()
-        logger.info(f"Sleeping for {CONST_SLEEP_INTERVAL}")
-        print(f"Sleeping for {CONST_SLEEP_INTERVAL}")
-        time.sleep(CONST_SLEEP_INTERVAL)
-
+        ping_and_publish()
+        sleep_interval = randrange(CONST_SLEEP_INTERVAL,CONST_SLEEP_INTERVAL*2)
+        logger.info(f"Sleeping for {sleep_interval}")
+        print(f"Sleeping for {sleep_interval}")
+        time.sleep(sleep_interval)
