@@ -7,6 +7,7 @@ import logging
 import time
 import os
 from random import randrange
+import datetime
 
 from const import CONST_WEBSITES,CONST_MQTT_HOST,CONST_MQTT_USERNAME,CONST_MQTT_PASSWORD,VERSION,CONST_SLEEP_INTERVAL, IS_CONTAINER
 
@@ -60,8 +61,8 @@ def initialize():
     client.connect( CONST_MQTT_HOST, 1883)
 
     for website in CONST_WEBSITES:
-        website_replace=replace_periods(website)
 
+        website_replace=replace_periods(website)
         whatismyip_sensor=WhatIsMyIpSensor(website)
         # Convert dictionary to JSON string
         serialized_message = json.dumps(whatismyip_sensor.to_json())
@@ -124,8 +125,9 @@ if __name__ == '__main__':
     initialize()
 
     while True:
+
         ping_and_publish()
         sleep_interval = randrange(CONST_SLEEP_INTERVAL,CONST_SLEEP_INTERVAL*2)
-        logger.info(f"Sleeping for {sleep_interval}")
-        print(f"Sleeping for {sleep_interval}")
+        logger.info(f"It is {datetime.datetime.now()} .. I am sleeping for {sleep_interval}")
+        print(f"It is {datetime.datetime.now()} ... I am sleeping for {sleep_interval}")
         time.sleep(sleep_interval)
