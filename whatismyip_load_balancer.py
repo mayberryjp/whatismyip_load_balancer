@@ -88,11 +88,19 @@ def ping_and_publish():
     logger.info(f"Checking...",end="")
     print(f"Checking...",end="")
 
+
     for website in CONST_WEBSITES:
         logger.info(f"{count}..,",end="")
         print(f"{count}..",end="")
 
-        payload = get_http_payload(website)
+        try: 
+           payload = get_http_payload(website)
+        except:
+            logger.info(f"{website} failed, skipping")
+            print(f"{website} failed, skipping")
+
+
+        payload_strip = "Unknown"
 
         if payload != None:
             payload_strip = payload.strip()
