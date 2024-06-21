@@ -84,7 +84,12 @@ def ping_and_publish():
 
     count=0
 
+    logger.info(f"Checking...",end="")
+    print(f"Checking...",end="")
+
     for website in CONST_WEBSITES:
+        logger.info(f"{count}..,",end="")
+        print(f"{count}..",end="")
 
         payload = get_http_payload(website)
         payload_strip = payload.strip()
@@ -98,6 +103,9 @@ def ping_and_publish():
         client.publish(f"homeassistant/sensor/whatismyip_{website_replace}/state", payload=payload_strip, qos=0, retain=False)
  
     client.disconnect()
+
+    logger.info(f"")
+    print(f"")
 
     logger.info(f"I iterated over {count} sites and saw {len(sites)} unique IP addresses")
     print(f"I iterated over {count} sites and saw {len(sites)} unique IP addresses")
