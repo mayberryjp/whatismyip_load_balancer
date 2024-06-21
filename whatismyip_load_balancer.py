@@ -12,9 +12,9 @@ import datetime
 from const import CONST_WEBSITES,CONST_MQTT_HOST,CONST_MQTT_USERNAME,CONST_MQTT_PASSWORD,VERSION,CONST_SLEEP_INTERVAL, IS_CONTAINER
 
 if (IS_CONTAINER):
-    CONST_MQTT_HOST=os.getenv["MQTT_HOST"]
-    CONST_MQTT_PASSWORD=os.getenv["MQTT_PASSWORD"]
-    CONST_MQTT_USERNAME=os.getenv["MQTT_USERNAME"]
+    CONST_MQTT_HOST=os.getenv("MQTT_HOST","earthquake.832-5.jp")
+    CONST_MQTT_PASSWORD=os.getenv("MQTT_PASSWORD","")
+    CONST_MQTT_USERNAME=os.getenv("MQTT_USERNAME","japan")
 
 requests.packages.urllib3.util.connection.HAS_IPV6 = False
 
