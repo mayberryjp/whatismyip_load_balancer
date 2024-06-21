@@ -92,16 +92,18 @@ def ping_and_publish():
         print(f"{count}..",end="")
 
         payload = get_http_payload(website)
-        payload_strip = payload.strip()
 
-       # logger.info(f"Website {website} reports {payload_strip}")
-       # print(f"Website {website} reports {payload_strip}")
-        website_replace=replace_periods(website)
-        sites[payload_strip] = sites.get(payload_strip, 0) + 1
-        count=count+1
+        if payload != None:
+            payload_strip = payload.strip()
 
-        client.publish(f"homeassistant/sensor/whatismyip_{website_replace}/state", payload=payload_strip, qos=0, retain=False)
- 
+        # logger.info(f"Website {website} reports {payload_strip}")
+        # print(f"Website {website} reports {payload_strip}")
+            website_replace=replace_periods(website)
+            sites[payload_strip] = sites.get(payload_strip, 0) + 1
+            count=count+1
+
+            client.publish(f"homeassistant/sensor/whatismyip_{website_replace}/state", payload=payload_strip, qos=0, retain=False)
+    
     client.disconnect()
 
     logger.info(f"")
