@@ -68,7 +68,7 @@ def initialize():
         serialized_message = json.dumps(whatismyip_sensor.to_json())
         print(f"Sending sensor -> {serialized_message}")
         logger.info(f"Sending sensor -> {serialized_message}")
-        client.publish(f"homeassistant/sensor/japan_earthquake_{website}/config", payload=serialized_message, qos=0, retain=True)
+        client.publish(f"homeassistant/sensor/whatismyip_{website_replace}/config", payload=serialized_message, qos=0, retain=True)
  
     client.disconnect()
     logger.info(f"Initialization complete...")
