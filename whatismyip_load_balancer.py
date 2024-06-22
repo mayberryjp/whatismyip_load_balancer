@@ -15,16 +15,14 @@ WEBSITES=[]
 
 if (IS_CONTAINER):
     CONST_MQTT_HOST=os.getenv("MQTT_HOST","earthquake.832-5.jp")
-    CONST_MQTT_PASSWORD=os.getenv("MQTT_PASSWORD","")
+    CONST_MQTT_PASSWORD=os.getenv("MQTT_PASSWORD","earthquake")
     CONST_MQTT_USERNAME=os.getenv("MQTT_USERNAME","japan")
 
-VERSION6 = os.getenv("VERSION6",False)
-VERSION_STRING=""
+VERSION_STRING = os.getenv("VERSION","v4")
 
-if (VERSION6 == False):
+if (VERSION_STRING == "v4"):
     WEBSITES=CONST_WEBSITES_V4
     requests.packages.urllib3.util.connection.HAS_IPV6 = False
-    VERSION_STRING="v4"
 else:
     WEBSITES=CONST_WEBSITES_V6
     requests.packages.urllib3.util.connection.HAS_IPV6 = True
