@@ -6,7 +6,9 @@ services:
       - 8.8.4.4
     container_name: whatismyip_load_balancer
     restart: "unless-stopped"
-    image: whatismyip_load_balancer:v1.0.15
+    image: whatismyip_load_balancer:v1.0.16
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - MQTT_PASSWORD=
 

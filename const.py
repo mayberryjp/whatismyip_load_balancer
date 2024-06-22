@@ -1,6 +1,6 @@
 IS_CONTAINER=1
 
-VERSION="v1.0.15"
+VERSION="v1.0.16"
 
 CONST_SLEEP_INTERVAL=150
 
@@ -21,5 +21,6 @@ CONST_WEBSITES = [
     'https://api.seeip.org',
     'https://ipapi.co/ip',
     'https://ip2location.io/ip',
-    'http://ifconfig.co'
+    'http://ifconfig.co',
+    'http://v4.i-p.show',
 ]
