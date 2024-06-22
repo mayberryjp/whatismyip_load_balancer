@@ -9,7 +9,7 @@ import os
 from random import randrange
 import datetime
 
-from const import CONST_WEBSITES,VERSION,CONST_SLEEP_INTERVAL, IS_CONTAINER, CONST_WEBSITES_V6
+from const import CONST_WEBSITES_V4,VERSION,CONST_SLEEP_INTERVAL, IS_CONTAINER, CONST_WEBSITES_V6
 
 WEBSITES=[]
 
@@ -18,13 +18,13 @@ if (IS_CONTAINER):
     CONST_MQTT_PASSWORD=os.getenv("MQTT_PASSWORD","")
     CONST_MQTT_USERNAME=os.getenv("MQTT_USERNAME","japan")
 
-VERSION6 = os.getenv("VERSION6",True)
+VERSION6 = os.getenv("VERSION6",False)
 VERSION_STRING=""
 
 if (VERSION6 == False):
-    WEBSITES=CONST_WEBSITES
+    WEBSITES=CONST_WEBSITES_V4
     requests.packages.urllib3.util.connection.HAS_IPV6 = False
-    VERSION_STRING=""
+    VERSION_STRING="v4"
 else:
     WEBSITES=CONST_WEBSITES_V6
     requests.packages.urllib3.util.connection.HAS_IPV6 = True

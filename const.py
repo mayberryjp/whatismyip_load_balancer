@@ -1,10 +1,10 @@
 IS_CONTAINER=1
 
-VERSION="v1.0.19"
+VERSION="v1.0.20"
 
 CONST_SLEEP_INTERVAL=150
 
-CONST_WEBSITES = [
+CONST_WEBSITES_V4 = [
     'http://ifconfig.me',
     'http://icanhazip.com',
     'http://ipinfo.io/ip',
