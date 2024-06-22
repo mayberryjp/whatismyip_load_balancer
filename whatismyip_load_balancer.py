@@ -80,7 +80,7 @@ def initialize():
         serialized_message = json.dumps(whatismyip_sensor.to_json())
         print(f"Sending sensor -> {serialized_message}")
         logger.info(f"Sending sensor -> {serialized_message}")
-       # client.publish(f"homeassistant/sensor/whatismyip{VERSION_STRING}_{website_replace}/config", payload=serialized_message, qos=0, retain=True)
+        client.publish(f"homeassistant/sensor/whatismyip{VERSION_STRING}_{website_replace}/config", payload=serialized_message, qos=0, retain=True)
  
     client.disconnect()
     logger.info(f"Initialization complete...")
@@ -123,7 +123,7 @@ def ping_and_publish():
             sites[payload_strip] = sites.get(payload_strip, 0) + 1
             count=count+1
 
-         #   client.publish(f"homeassistant/sensor/whatismyip{VERSION_STRING}_{website_replace}/state", payload=payload_strip, qos=0, retain=False)
+            client.publish(f"homeassistant/sensor/whatismyip{VERSION_STRING}_{website_replace}/state", payload=payload_strip, qos=0, retain=False)
     
     client.disconnect()
 
