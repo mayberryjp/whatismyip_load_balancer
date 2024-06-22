@@ -18,7 +18,7 @@ if (IS_CONTAINER):
     CONST_MQTT_PASSWORD=os.getenv("MQTT_PASSWORD","")
     CONST_MQTT_USERNAME=os.getenv("MQTT_USERNAME","japan")
 
-VERSION6 = os.getenv("VERSION6",False)
+VERSION6 = os.getenv("VERSION6",True)
 VERSION_STRING=""
 
 if (VERSION6 == False):

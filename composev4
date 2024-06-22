@@ -1,6 +1,7 @@
 version: "3"
 services:
   whatismyip_load_balancer:
+    network_mode: host
     dns:
       - 8.8.8.8
       - 8.8.4.4
