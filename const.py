@@ -1,6 +1,6 @@
 IS_CONTAINER=1
 
-VERSION="v1.0.16"
+VERSION="v1.0.17"
 
 CONST_SLEEP_INTERVAL=150
 
@@ -23,4 +23,11 @@ CONST_WEBSITES = [
     'https://ip2location.io/ip',
     'http://ifconfig.co',
     'http://v4.i-p.show',
+]
+
+CONST_WEBSITES_V6 = [
+    'https://ipv6.ident.me/',
+    'https://ipv6.seeip.org',
+    'http://v6.i-p.show',
+    'https://api6.ipify.org',
 ]

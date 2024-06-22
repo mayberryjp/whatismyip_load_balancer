@@ -9,14 +9,26 @@ import os
 from random import randrange
 import datetime
 
-from const import CONST_WEBSITES,VERSION,CONST_SLEEP_INTERVAL, IS_CONTAINER
+from const import CONST_WEBSITES,VERSION,CONST_SLEEP_INTERVAL, IS_CONTAINER, CONST_WEBSITES_V6
+
+WEBSITES=[]
 
 if (IS_CONTAINER):
     CONST_MQTT_HOST=os.getenv("MQTT_HOST","earthquake.832-5.jp")
     CONST_MQTT_PASSWORD=os.getenv("MQTT_PASSWORD","")
     CONST_MQTT_USERNAME=os.getenv("MQTT_USERNAME","japan")
 
-requests.packages.urllib3.util.connection.HAS_IPV6 = False
+VERSION6 = os.getenv("VERSION6",False)
+VERSION_STRING=""
+
+if (VERSION6 == False):
+    WEBSITES=CONST_WEBSITES
+    requests.packages.urllib3.util.connection.HAS_IPV6 = False
+    VERSION_STRING=""
+else:
+    WEBSITES=CONST_WEBSITES_V6
+    requests.packages.urllib3.util.connection.HAS_IPV6 = True
+    VERSION_STRING="v6"
 
 # Function to get payload from HTTP website
 def get_http_payload(url):
@@ -34,13 +46,13 @@ def replace_periods(ip_address):
 class WhatIsMyIpSensor:
     def __init__(self, name):
         name_replace=replace_periods(name)
-        self.name = f"whatismyip_{name_replace}"
+        self.name = f"whatismyip{VERSION_STRING}_{name_replace}"
         self.device_class = None
-        self.state_topic = f"homeassistant/sensor/whatismyip_{name_replace}/state"
-        self.unique_id = f"whatismyip_{name_replace}"
+        self.state_topic = f"homeassistant/sensor/whatismyip{VERSION_STRING}_{name_replace}/state"
+        self.unique_id = f"whatismyip{VERSION_STRING}_{name_replace}"
         self.device = {
-            "identifiers": [f"whatismyip_{name_replace}"],
-            "name": f"What Is My IP Response For {name}"
+            "identifiers": [f"whatismyip{VERSION_STRING}_{name_replace}"],
+            "name": f"What Is My IP{VERSION_STRING} Response For {name}"
         }
 
     def to_json(self):
@@ -60,7 +72,7 @@ def initialize():
     client.username_pw_set(CONST_MQTT_USERNAME,CONST_MQTT_PASSWORD)
     client.connect( CONST_MQTT_HOST, 1883)
 
-    for website in CONST_WEBSITES:
+    for website in WEBSITES:
 
         website_replace=replace_periods(website)
         whatismyip_sensor=WhatIsMyIpSensor(website)
@@ -68,7 +80,7 @@ def initialize():
         serialized_message = json.dumps(whatismyip_sensor.to_json())
         print(f"Sending sensor -> {serialized_message}")
         logger.info(f"Sending sensor -> {serialized_message}")
-        client.publish(f"homeassistant/sensor/whatismyip_{website_replace}/config", payload=serialized_message, qos=0, retain=True)
+       # client.publish(f"homeassistant/sensor/whatismyip{VERSION_STRING}_{website_replace}/config", payload=serialized_message, qos=0, retain=True)
  
     client.disconnect()
     logger.info(f"Initialization complete...")
@@ -89,7 +101,7 @@ def ping_and_publish():
     print(f"Checking...",end="")
 
 
-    for website in CONST_WEBSITES:
+    for website in WEBSITES:
         logger.info(f"{count}..,",end="")
         print(f"{count}..",end="")
 
@@ -111,7 +123,7 @@ def ping_and_publish():
             sites[payload_strip] = sites.get(payload_strip, 0) + 1
             count=count+1
 
-            client.publish(f"homeassistant/sensor/whatismyip_{website_replace}/state", payload=payload_strip, qos=0, retain=False)
+         #   client.publish(f"homeassistant/sensor/whatismyip{VERSION_STRING}_{website_replace}/state", payload=payload_strip, qos=0, retain=False)
     
     client.disconnect()
 
