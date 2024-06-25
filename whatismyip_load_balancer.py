@@ -13,6 +13,13 @@ from const import CONST_WEBSITES_V4,VERSION,CONST_SLEEP_INTERVAL, IS_CONTAINER, 
 
 WEBSITES=[]
 
+def on_connect(client, userdata, flags, rc):
+    if rc != 0:
+        print(f"Failed to connect with result code {rc}")
+        # Handle the connection failure
+    else:
+        print("Connected successfully")
+
 if (IS_CONTAINER):
     CONST_MQTT_HOST=os.getenv("MQTT_HOST","earthquake.832-5.jp")
     CONST_MQTT_PASSWORD=os.getenv("MQTT_PASSWORD","earthquake")
@@ -67,6 +74,7 @@ def initialize():
     logger.info(f"Initialization starting...")
     print("Initialization starting...")
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+    client.on_connect = on_connect
     client.username_pw_set(CONST_MQTT_USERNAME,CONST_MQTT_PASSWORD)
     client.connect( CONST_MQTT_HOST, 1883)
 
@@ -87,6 +95,7 @@ def initialize():
 # Function to publish payload to MQTT topic
 def ping_and_publish():
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+    client.on_connect = on_connect
     client.username_pw_set(CONST_MQTT_USERNAME,CONST_MQTT_PASSWORD)
     client.connect( CONST_MQTT_HOST, 1883)
     logger = logging.getLogger(__name__)
