@@ -111,24 +111,23 @@ def ping_and_publish():
     for website in WEBSITES:
         logger.info(f"{count}..,",end="")
         print(f"{count}..",end="")
-
-        payload = "Unknown"
+        website_replace=replace_periods(website)
 
         try: 
-           payload = get_http_payload(website)
+            payload = get_http_payload(website)
+            payload_strip = payload.strip()
+
+            sites[payload_strip] = sites.get(payload_strip, 0) + 1
+            count=count+1
+
+            client.publish(f"homeassistant/sensor/whatismyip{VERSION_STRING}_{website_replace}/state", payload=payload_strip, qos=0, retain=False)
+
         except:
-            logger.info(f"{website} failed, skipping")
-            print(f"{website} failed, skipping")
-
-        payload_strip = payload.strip()
-
-        # logger.info(f"Website {website} reports {payload_strip}")
-        # print(f"Website {website} reports {payload_strip}")
-        website_replace=replace_periods(website)
-        sites[payload_strip] = sites.get(payload_strip, 0) + 1
-        count=count+1
-
-        client.publish(f"homeassistant/sensor/whatismyip{VERSION_STRING}_{website_replace}/state", payload=payload_strip, qos=0, retain=False)
+            client.publish(f"homeassistant/sensor/whatismyip{VERSION_STRING}_{website_replace}/state", payload=f"Unknown{randrange(1,10)}", qos=0, retain=False)
+            count=count+1
+            logger.info(f"\n{website} failed, skipping")
+            print(f"\n{website} failed, skipping")
+            continue
     
     client.disconnect()
 
