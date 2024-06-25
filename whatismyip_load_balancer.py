@@ -36,7 +36,7 @@ def get_http_payload(url):
         return response.text
     else:
         print(f'Failed to get payload from {url}')
-        return None
+        return "Unknown"
 
 def replace_periods(ip_address):
     return re.sub(r'\W', '_', ip_address)
@@ -103,25 +103,23 @@ def ping_and_publish():
         logger.info(f"{count}..,",end="")
         print(f"{count}..",end="")
 
+        payload = "Unknown"
+
         try: 
            payload = get_http_payload(website)
         except:
             logger.info(f"{website} failed, skipping")
             print(f"{website} failed, skipping")
 
-
-        payload_strip = "Unknown"
-
-        if payload != None:
-            payload_strip = payload.strip()
+        payload_strip = payload.strip()
 
         # logger.info(f"Website {website} reports {payload_strip}")
         # print(f"Website {website} reports {payload_strip}")
-            website_replace=replace_periods(website)
-            sites[payload_strip] = sites.get(payload_strip, 0) + 1
-            count=count+1
+        website_replace=replace_periods(website)
+        sites[payload_strip] = sites.get(payload_strip, 0) + 1
+        count=count+1
 
-            client.publish(f"homeassistant/sensor/whatismyip{VERSION_STRING}_{website_replace}/state", payload=payload_strip, qos=0, retain=False)
+        client.publish(f"homeassistant/sensor/whatismyip{VERSION_STRING}_{website_replace}/state", payload=payload_strip, qos=0, retain=False)
     
     client.disconnect()
 

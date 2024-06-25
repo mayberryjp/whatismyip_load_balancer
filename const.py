@@ -2,7 +2,7 @@ IS_CONTAINER=1
 
 VERSION="v1.0.21"
 
-CONST_SLEEP_INTERVAL=150
+CONST_SLEEP_INTERVAL=5
 
 CONST_WEBSITES_V4 = [
     'http://ifconfig.me',
@@ -25,7 +25,7 @@ CONST_WEBSITES_V4 = [
     'http://v4.i-p.show',
     'http://ip.sb',
     'https://myip.wtf',
-    'https://eth0.me'
+    'https://eth0.me',
 ]
 
 CONST_WEBSITES_V6 = [
