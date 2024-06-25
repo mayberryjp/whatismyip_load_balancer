@@ -20,6 +20,7 @@ def on_connect(client, userdata, flags, rc):
     else:
         print("Connected successfully")
 
+
 if (IS_CONTAINER):
     CONST_MQTT_HOST=os.getenv("MQTT_HOST","earthquake.832-5.jp")
     CONST_MQTT_PASSWORD=os.getenv("MQTT_PASSWORD","earthquake")
@@ -97,7 +98,6 @@ def ping_and_publish():
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
     client.on_connect = on_connect
     client.username_pw_set(CONST_MQTT_USERNAME,CONST_MQTT_PASSWORD)
-    client.connect( CONST_MQTT_HOST, 1883)
     logger = logging.getLogger(__name__)
 
     sites = {}
@@ -119,18 +119,19 @@ def ping_and_publish():
 
             sites[payload_strip] = sites.get(payload_strip, 0) + 1
             count=count+1
-
-            client.publish(f"homeassistant/sensor/whatismyip{VERSION_STRING}_{website_replace}/state", payload=payload_strip, qos=0, retain=False)
+            client.connect( CONST_MQTT_HOST, 1883)
+            client.publish(f"homeassistant/sensor/whatismyip{VERSION_STRING}_{website_replace}/state", payload=payload_strip, qos=0, retain=False)    
+            client.disconnect()
 
         except:
-            client.publish(f"homeassistant/sensor/whatismyip{VERSION_STRING}_{website_replace}/state", payload=f"Unknown{randrange(1,10)}", qos=0, retain=False)
+            client.connect( CONST_MQTT_HOST, 1883)
+            client.publish(f"homeassistant/sensor/whatismyip{VERSION_STRING}_{website_replace}/state", payload=f"Unknown{randrange(1,10)}", qos=0, retain=False)     
+            client.disconnect()
             count=count+1
             logger.info(f"\n{website} failed, skipping")
             print(f"\n{website} failed, skipping")
             continue
     
-    client.disconnect()
-
     logger.info(f"")
     print(f"")
 
