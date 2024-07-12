@@ -13,12 +13,18 @@ from const import CONST_WEBSITES_V4,VERSION,CONST_SLEEP_INTERVAL, IS_CONTAINER, 
 
 WEBSITES=[]
 
+def on_publish(client, userdata, mid, reason_code, properties): 
+    pass
+
 def on_connect(client, userdata, flags, rc):
-    if rc != 0:
-        print(f"Failed to connect with result code {rc}")
-        # Handle the connection failure
+    if rc == 0:
+        print("Connected successfully.")
     else:
-        print("Connected successfully")
+        print("Connection failed with error code " + str(rc))
+
+def on_disconnect(client, userdata, disconnect_flags, rc,properties):
+    if rc != 0:
+        print("Unexpected disconnection.")
 
 
 if (IS_CONTAINER):
@@ -75,9 +81,14 @@ def initialize():
     logger.info(f"Initialization starting...")
     print("Initialization starting...")
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+    client.on_publish = on_publish
     client.on_connect = on_connect
+    client.on_disconnect = on_disconnect
     client.username_pw_set(CONST_MQTT_USERNAME,CONST_MQTT_PASSWORD)
-    client.connect( CONST_MQTT_HOST, 1883)
+    try:
+      client.connect(CONST_MQTT_HOST, 1883)
+    except Exception as e:
+        print("Error connecting to MQTT Broker: " + str(e))
 
     for website in WEBSITES:
 
@@ -87,18 +98,36 @@ def initialize():
         serialized_message = json.dumps(whatismyip_sensor.to_json())
         print(f"Sending sensor -> {serialized_message}")
         logger.info(f"Sending sensor -> {serialized_message}")
-        client.publish(f"homeassistant/sensor/whatismyip{VERSION_STRING}_{website_replace}/config", payload=serialized_message, qos=0, retain=True)
- 
-    client.disconnect()
+
+        try:
+            ret = client.publish(f"homeassistant/sensor/whatismyip{VERSION_STRING}_{website_replace}/config", payload=serialized_message, qos=0, retain=True)
+            if ret.rc == mqtt.MQTT_ERR_SUCCESS:
+                pass
+            else:
+                print("Failed to queue message with error code " + str(ret))
+        except Exception as e:
+            print("Error publishing message: " + str(e))
+
+    try:
+        client.disconnect()
+    except Exception as e:
+        print("Error disconnecting from MQTT Broker: " + str(e))
     logger.info(f"Initialization complete...")
     print("Initialization complete...")
 
 # Function to publish payload to MQTT topic
 def ping_and_publish():
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+    client.on_publish = on_publish
     client.on_connect = on_connect
+    client.on_disconnect = on_disconnect
     client.username_pw_set(CONST_MQTT_USERNAME,CONST_MQTT_PASSWORD)
     logger = logging.getLogger(__name__)
+
+    try:
+      client.connect(CONST_MQTT_HOST, 1883)
+    except Exception as e:
+        print("Error connecting to MQTT Broker: " + str(e))
 
     sites = {}
 
@@ -113,27 +142,35 @@ def ping_and_publish():
         print(f"{count}..",end="")
         website_replace=replace_periods(website)
 
+
         try: 
             payload = get_http_payload(website)
-            payload_strip = payload.strip()
-
-            sites[payload_strip] = sites.get(payload_strip, 0) + 1
-            count=count+1
-            client.connect( CONST_MQTT_HOST, 1883)
-            client.publish(f"homeassistant/sensor/whatismyip{VERSION_STRING}_{website_replace}/state", payload=payload_strip, qos=0, retain=False)    
-            client.disconnect()
-
         except:
-            client.connect( CONST_MQTT_HOST, 1883)
-            client.publish(f"homeassistant/sensor/whatismyip{VERSION_STRING}_{website_replace}/state", payload=f"Unknown{randrange(1,10)}", qos=0, retain=False)     
-            client.disconnect()
-            count=count+1
+            payload = f"Unknown{randrange(1,10)}"
             logger.info(f"\n{website} failed, skipping")
             print(f"\n{website} failed, skipping")
-            continue
+
+        payload_strip = payload.strip()
+        sites[payload_strip] = sites.get(payload_strip, 0) + 1
+
+        try:
+            ret = client.publish(f"homeassistant/sensor/whatismyip{VERSION_STRING}_{website_replace}/state", payload=payload_strip, qos=0, retain=False)  
+            if ret.rc == mqtt.MQTT_ERR_SUCCESS:
+                pass
+            else:
+                print("Failed to queue message with error code " + str(ret))
+        except Exception as e:
+            print("Error publishing message: " + str(e))
+
+        count=count+1
     
     logger.info(f"")
     print(f"")
+
+    try:
+        client.disconnect()
+    except Exception as e:
+        print("Error disconnecting from MQTT Broker: " + str(e))
 
     logger.info(f"I iterated over {count} sites and saw {len(sites)} unique IP addresses")
     print(f"I iterated over {count} sites and saw {len(sites)} unique IP addresses")

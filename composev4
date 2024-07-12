@@ -7,7 +7,7 @@ services:
       - 8.8.4.4
     container_name: whatismyip_load_balancer
     restart: "unless-stopped"
-    image: whatismyip_load_balancer:v1.0.28
+    image: whatismyip_load_balancer:v1.0.29
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
