@@ -136,12 +136,13 @@ def ping_and_publish():
     logger.info(f"Checking...",end="")
     print(f"Checking...",end="")
 
+    HAS_EXCEPTION=False
 
     for website in WEBSITES:
         logger.info(f"{count}..,",end="")
         print(f"{count}..",end="")
         website_replace=replace_periods(website)
-
+        HAS_EXCEPTION=False
 
         try: 
             payload = get_http_payload(website)
@@ -149,11 +150,15 @@ def ping_and_publish():
             payload = f"Unknown{randrange(1,10)}"
             logger.info(f"\n{website} failed, skipping")
             print(f"\n{website} failed, skipping")
+            HAS_EXCEPTION=True
 
         payload_strip = payload.strip()
         sites[payload_strip] = sites.get(payload_strip, 0) + 1
 
         try:
+            if HAS_EXCEPTION:
+                     client.connect(CONST_MQTT_HOST, 1883)
+                     
             ret = client.publish(f"homeassistant/sensor/whatismyip{VERSION_STRING}_{website_replace}/state", payload=payload_strip, qos=0, retain=False)  
             if ret.rc == mqtt.MQTT_ERR_SUCCESS:
                 pass
