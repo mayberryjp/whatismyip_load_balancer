@@ -138,8 +138,8 @@ def ping_and_publish():
     print(f"Checking...",end="")
 
     HAS_EXCEPTION=False
-
-    for website in random.shuffle(WEBSITES):
+    random.shuffle(WEBSITES)
+    for website in WEBSITES:
         logger.info(f"{count}..,",end="")
         print(f"{count}..",end="")
         website_replace=replace_periods(website)
