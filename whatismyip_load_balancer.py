@@ -8,6 +8,7 @@ import time
 import os
 from random import randrange
 import datetime
+import random
 
 from const import CONST_WEBSITES_V4,VERSION,CONST_SLEEP_INTERVAL, IS_CONTAINER, CONST_WEBSITES_V6
 
@@ -138,7 +139,7 @@ def ping_and_publish():
 
     HAS_EXCEPTION=False
 
-    for website in WEBSITES:
+    for website in random.shuffle(WEBSITES):
         logger.info(f"{count}..,",end="")
         print(f"{count}..",end="")
         website_replace=replace_periods(website)
