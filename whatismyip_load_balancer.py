@@ -38,7 +38,7 @@ def get_http_payload(url):
         return response.text
     else:
         print(f'Failed to get payload from {url}')
-        return "Unknown"
+        return f"Unknown{randrange(1,10)}"
 
 def replace_periods(ip_address):
     return re.sub(r'\W', '_', ip_address)
